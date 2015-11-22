@@ -1,0 +1,45 @@
+Predicting Manner of Exercise
+======================================================
+##Tiffani Heaberlin
+
+##Overview 
+In this assignment, predicting the manner of exercise for 20 subjects.
+
+##Reading in Data
+We have a dataset of 19,622 observations and 160 columns.  The first columns is
+simply the row number.  The data will be read in.
+```{r}
+setwd("C:/Users/slussetc/Documents/GitHub/Machine_Learning")
+library("caret")
+set.seed(200)
+training<-read.csv("TrainingData.csv")
+```
+##Model Training
+I am a firm believer in less is more when it comes to the amount of predictors
+in a model.  If the prediction is accurate with fewer predictors, it can make it
+easier to explain and also means your chances of overfitting are reduced.  Due
+to that, I decided to just use the initial set of 5 columns past the identifiers.
+These were: new_window, num_window, roll_belt, pitch_belt, yaw_belt.
+```{r}
+traindata<-training[,c(6:10,160)]
+traindata<-na.omit(traindata)
+modelfit <- train(classe~.,data=traindata,method="knn")
+modelfit
+```
+##Prediction of Test Data
+Due to the accuracy of the inital model run, I used that to predict the classe
+of the 20 test subjects.  The predictions were successful when submitted.  I
+utilized the function supplied by the instructor to create the submission files.
+```{r}
+testing<-read.csv("TestData.csv")
+testpred<-predict(modelfit,testing)
+setwd("TestPredictions")
+pml_write_files = function(x){
+  n = length(x)
+  for(i in 1:n){
+    filename = paste0("problem_id_",i,".txt")
+    write.table(x[i],file=filename,quote=FALSE,row.names=FALSE,col.names=FALSE)
+  }
+}
+pml_write_files(testpred)
+```
